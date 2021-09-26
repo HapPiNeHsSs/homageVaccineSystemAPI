@@ -1,0 +1,377 @@
+{
+	"info": {
+		"_postman_id": "6efdc7dd-174b-42b9-8de4-cceaa2673a9f",
+		"name": "Homage",
+		"description": "Collection of APIs for simple Out-Patient Reservation system (vaccination system)\n\nBeejay Urzo",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Location",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_name\": \"tea2e1ddd3s\",\r\n\"date_start\":\"20/09/2021\",\r\n\"date_end\":\"26/10/2021\",\r\n\"available_nurses\":1}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/create_location",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"create_location"
+					]
+				},
+				"description": "Create a Location with a date range and default nurses available for those date\n\nNewly created Date slots would have 0800 to 2000 (1 hour per slot) Time slots with default the default number of slots set\n\nParams\n- location_name:  Location name\n- date_start: (dd/mm/yyyy) date when location can start accept patients\n- date_end: (dd/mm/yyyy) date when location will end accepting patients\n- available_nurses: number of default nurses\n  \nReturn (JSON)\n- Success: {\"success\":\"location created\", \"location_id\": ID, \"location_name\": LOC_NAME, \"date_start\": date, \"date_end\", date, \"available_nurses\": number}\n- Error Duplicate Location: {\"error\": \"duplicate location name\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Locations",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{URI}}/api/get_locations",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"get_locations"
+					]
+				},
+				"description": "Returns all available locations\n  \nReturn (json)\n- Success [{\"location_id\": ID, \"location_name\": Name}, ...]"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Dates",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URI}}/api/get_dates?location_id=0",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"get_dates"
+					],
+					"query": [
+						{
+							"key": "location_id",
+							"value": "0"
+						}
+					]
+				},
+				"description": "Returns all available date for a location\n\nParams\n- location_id: Location ID\n\nReturn (json)\n- Success {\"location_id\":ID, \"location_name\": name, \"dates\":[{\"date\": date}, ...]}\n- Error Location ID not found: {\"error\": \"location id not found\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Get Slots",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URI}}/api/get_slots?location_id=0&date=28/09/2021",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"get_slots"
+					],
+					"query": [
+						{
+							"key": "location_id",
+							"value": "0"
+						},
+						{
+							"key": "date",
+							"value": "28/09/2021"
+						}
+					]
+				},
+				"description": "Returns slot data for location and date\n\nParams\n- location_id: Location ID\n- date: (dd/mm/yyyy) date\n\nReturn (json)\n- Success {\"location\":{\"location_id\":ID, \"location_name\": name}, \"date\":date \"slots\":[{\"slot\": 0-23, \"available_nurses\":number, \"capacity\" available_nurses * nurse_capacity, \"available_space\": space, \"patients\":[{\"patient_id\": ID, \"patient_name\": Name, \"patient_email\": email, ...}] }, ...]}\n- Error Location ID or date not found: {\"error\": \"location Id or Date not found\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Add or Update Date",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 1,\r\n\"date\":\"23/12/2021\",\r\n\"available_nurses\":2}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/add_update_date",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"add_update_date"
+					]
+				},
+				"description": "Create or Update a location date and set default nurses available for all slots\nNewly created Date would have 0800 to 2000 (1 hour per slot) Time slots with default the default number of slots set\n\nParams\n- location_id:  Location ID\n- date:(dd/mm/yyyy) date to update or create\n- available_nurses: number of default nurses\n  \nReturn (JSON)\n- Success: {\"success\":\"date updated or created\", \"location_id\": ID, \"date\": date, \"available_nurses\": number}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}\n- Error Location ID required: {\"error\": \"Parameter location_id is required\"}\n- Error Available Nurses Required: {\"error\": \"Parameter available_nurses is required\"}\n- Error Date Format: {\"error\": \"Parameter date is required\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Add or Update Slot",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 0,\r\n\"date\":\"27/09/2021\",\r\n\"slot\":18,\r\n\"available_nurses\":92}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/add_update_slot",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"add_update_slot"
+					]
+				},
+				"description": "Create or Update a location date slot and set number of nurses available\n\nParams\n- location_id:  Location ID\n- date:(dd/mm/yyyy) date to update or create\n- slot: time in hours, 0-23\n- available_nurses: number nurses available\n  \nReturn (JSON)\n- Success: {\"success\":\"slot updated or created\", \"location_id\": ID, \"date\": date, \"slot\": slot(0-24), \"available_nurses\": number}\n- Error Location ID not found: {\"error\": \"location id not found\"}\n- Error Location ID required: {\"error\": \"Parameter location_id is required\"}\n- Error Slot required: {\"error\": \"Parameter slot is required\"}\n- Error Date Format: {\"error\": \"Parameter date is required\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}\n- Error Slot Format: {\"error\": \"time format is hours from 0-23\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Location",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 1}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/delete_location",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"delete_location"
+					]
+				},
+				"description": "Deletes a location (all reservations will be lost for this location)\r\n\r\nParams\r\n- location_id: Location ID\r\n\r\nReturn (JSON)\r\n- Success: {\"success\":\"location deleted, all reservations removed for this location\", \"location_id\": ID}\r\n- Error Location ID not found: {\"error\": \"location id not found\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Date",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 0,\r\n\"date\":\"22/09/2021\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/delete_date",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"delete_date"
+					]
+				},
+				"description": "Deletes a date (all reservations will be lost for this date)\r\n\r\nParams\r\n- location_id: Location ID\r\n- date: (dd/mm/yyyy) date to delete\r\n\r\nReturn (JSON)\r\n- Success: {\"success\":\"date deleted, all reservations removed for this date\", \"location_id\": ID, \"date\": date}\r\n- Error Location ID not found: {\"error\": \"location id not found\"}\r\n    Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Slot",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 0,\r\n\"date\":\"28/09/2021\",\r\n\"slot\":8}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/delete_slot",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"delete_slot"
+					]
+				},
+				"description": "Deletes a slot (all reservations will be lost for this slot)\n\nParams\n= location_id: Location ID\n- date: (dd/mm/yyyy) date\n- slot: time in hours, 0-23\n\nReturn (JSON)\n- Success: {\"success\":\"slot is deleted, all reservations removed for this slot\", \"location_id\": ID, \"date\": date, \"slot\": slot(0-24)}\n- Error Location ID not found: {\"error\": \"location id not found\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}\n- Error Time Format: {\"error\": \"time format is hours from 0-23\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Register",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 0,\r\n\"date\":\"28/09/2021\",\r\n\"slot\":11,\r\n\"patient_name\":\"Beejay\",\r\n\"patient_email\":\"beejay.urzo@gmail.com2\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/register",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"register"
+					]
+				},
+				"description": "Create a patient record and register that patient to a slot\n\nParams\n- location_id: ID of the location you want to register to\n- date: (dd/mm/yyyy) date you want to register\n- slot: time in hours, 0-23\n- patient_name: Name of patient\n- patient_email: email of patient(this will be our primary identifier)\n\nReturn (json)\n- Success {\"success\":\"Patient Registered\",\"patient_id:ID\", \"patient_name\":name, \"patient_email\":email\",\"location_id\":ID, \"location_name\": name, \"date\":date \"slot\":0-23}\n- Error Email already registered: {\"error\": \"email is already registered, info of existing user follows\", \"patient_id:ID\", \"patient_name\":name, \"patient_email\":email\",\"location_id\":ID, \"location_name\": name, \"date\":date \"slot\":0-23, }}\n- Error Location ID not found: {\"error\": \"location id not found\"}\n- Error Slot not found: {\"error\": \"Slot not found\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}\n- Error Slot Format: {\"error\": \"Slot format is hours from 0-23\"}\n- Error Slot not available {\"error\": \"Slot is Full, Please choose a different slot\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Schedule",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"location_id\": 0,\r\n\"date\":\"28/09/2021\",\r\n\"slot\":10,\r\n\"patient_name\":\"Beejay\",\r\n\"patient_email\":\"beejay.urzo@gmail.com2\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/update_schedule",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"update_schedule"
+					]
+				},
+				"description": "Update a user's schedule\n\nParams\n- location_id: ID of the location you want to move to\n- date: (dd/mm/yyyy) date you want to move to\n- slot: time in hours, 0-23\n- patient_name: Name of patient\n- patient_email: email of patient(this will be our primary identifier)\n\nReturn (json)\n- Success {\"success\":\"Patient Registered\",\"patient_id:ID\", \"patient_name\":name, \"patient_email\":email\",\"location_id\":ID, \"location_name\": name, \"date\":date \"slot\":0-23}\n- Error Not registered: {\"error\": \"This patient is not registered, please register the user\"}\n- Error Location ID not found: {\"error\": \"location id not found\"}\n- Error Slot not found: {\"error\": \"Slot not found\"}\n- Error Date Format: {\"error\": \"date format is dd/mm/yyyy\"}\n- Error Slot Format: {\"error\": \"Slot format is hours from 0-23\"}\n- Error Slot not available {\"error\": \"Slot is Full, Please choose a different slot\"}"
+			},
+			"response": []
+		},
+		{
+			"name": "Update Nurse to Patient Ratio",
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{URI}}/api/update_ratio?ratio=5",
+					"host": [
+						"{{URI}}"
+					],
+					"path": [
+						"api",
+						"update_ratio"
+					],
+					"query": [
+						{
+							"key": "ratio",
+							"value": "5"
+						}
+					]
+				},
+				"description": "Sets how many patients a nurse can handle. Will define the capacity of a Slot"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URI",
+			"value": "URL"
+		}
+	]
+}
